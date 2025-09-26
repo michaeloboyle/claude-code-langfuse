@@ -174,6 +174,12 @@ class ClaudeCodeLogger:
                 name="claude_interaction"
             ) as span:
 
+                # CRITICAL: Ensure this interaction is associated with the session
+                self.langfuse.update_current_trace(
+                    user_id=self.user_id,
+                    session_id=self.session_id
+                )
+
                 # Log the interaction
                 self.langfuse.update_current_span(
                     input={
@@ -231,13 +237,21 @@ class ClaudeCodeLogger:
                 name=f"tool_{tool_info.get('name', 'unknown')}"
             ) as span:
 
+                # CRITICAL: Ensure tool usage is associated with the session
+                self.langfuse.update_current_trace(
+                    user_id=self.user_id,
+                    session_id=self.session_id
+                )
+
                 self.langfuse.update_current_span(
                     input=tool_info.get("input", {}),
                     output=tool_info.get("output", {}),
                     metadata={
                         "tool_name": tool_info.get("name"),
                         "success": tool_info.get("success", True),
-                        "duration_ms": tool_info.get("duration_ms", 0)
+                        "duration_ms": tool_info.get("duration_ms", 0),
+                        "user_id": self.user_id,
+                        "session_id": self.session_id
                     }
                 )
 
@@ -288,6 +302,12 @@ class ClaudeCodeLogger:
             with self.langfuse.start_as_current_span(
                 name="session_end"
             ) as span:
+
+                # CRITICAL: Ensure session end is associated with the session
+                self.langfuse.update_current_trace(
+                    user_id=self.user_id,
+                    session_id=self.session_id
+                )
 
                 stats = {
                     "total_interactions": self.interaction_count,
