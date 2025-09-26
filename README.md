@@ -147,7 +147,9 @@ claude-code-langfuse/
 │   ├── session_analysis.py
 │   └── custom_scoring.py
 └── tests/                       # Test suite
-    └── test_logger.py
+    ├── __init__.py
+    ├── test_claude_logger.py
+    └── test_track.py
 ```
 
 ## 🔧 Configuration
@@ -244,6 +246,55 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Examples](examples/)
 - [API Reference](docs/api.md)
 - [FAQ](docs/faq.md)
+
+## 🧪 Testing
+
+This project includes comprehensive test coverage to ensure reliability.
+
+### Running Tests
+
+```bash
+# Install test dependencies
+pip install -r requirements.txt
+
+# Run all tests
+pytest
+
+# Run tests with coverage
+pytest --cov=. --cov-report=html --cov-report=term-missing
+
+# Run specific test files
+pytest tests/test_claude_logger.py
+pytest tests/test_track.py
+
+# Run tests in verbose mode
+pytest -v
+```
+
+### Test Structure
+
+- **`tests/test_claude_logger.py`**: Comprehensive tests for the `ClaudeCodeLogger` class
+  - Mock-based testing to avoid actual LangFuse API calls
+  - Tests for initialization, session management, interaction logging
+  - Error handling and edge case coverage
+  - Integration test scenarios
+
+- **`tests/test_track.py`**: Tests for the main tracking script
+  - Command-line interface testing
+  - Interactive and background mode functionality
+  - Input validation and error handling
+  - Environment variable configuration
+
+### Coverage Reports
+
+After running tests with coverage, open `htmlcov/index.html` to view detailed coverage reports.
+
+### Continuous Integration
+
+This project uses GitHub Actions for automated testing:
+- Tests run on Python 3.9, 3.10, 3.11, and 3.12
+- Code quality checks with flake8, black, and isort
+- Coverage reporting with Codecov integration
 
 ## 🚦 Status
 

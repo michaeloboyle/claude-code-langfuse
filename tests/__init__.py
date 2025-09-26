@@ -1,0 +1,1 @@
+# Test package for Claude Code LangFuse Observer

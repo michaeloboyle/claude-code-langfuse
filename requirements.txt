@@ -8,3 +8,8 @@ python-dotenv>=1.0.0
 pydantic>=2.0.0  # For data validation
 rich>=13.0.0  # For beautiful CLI output
 click>=8.1.0  # For advanced CLI features
+
+# Testing dependencies
+pytest>=7.0.0
+pytest-cov>=4.0.0
+pytest-mock>=3.10.0
