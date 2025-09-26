@@ -1,0 +1,10 @@
+# Claude Code LangFuse Observer - Python Requirements
+
+# Core dependencies
+langfuse>=3.5.0
+python-dotenv>=1.0.0
+
+# Optional dependencies for enhanced functionality
+pydantic>=2.0.0  # For data validation
+rich>=13.0.0  # For beautiful CLI output
+click>=8.1.0  # For advanced CLI features
