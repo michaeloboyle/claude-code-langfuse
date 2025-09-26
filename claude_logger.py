@@ -10,6 +10,22 @@ from datetime import datetime
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 
+# Load environment variables from .env file if it exists
+try:
+    from dotenv import load_dotenv
+    # Try to load from current directory first, then from user's claude directory
+    env_paths = [
+        Path.cwd() / '.env',
+        Path.home() / '.claude' / 'langfuse.env',
+        Path(__file__).parent / '.env'
+    ]
+    for env_path in env_paths:
+        if env_path.exists():
+            load_dotenv(env_path)
+            break
+except ImportError:
+    pass
+
 try:
     from langfuse import Langfuse
 except ImportError:
@@ -76,19 +92,42 @@ class ClaudeCodeLogger:
             Session ID
         """
         try:
+            # Start a span that will be associated with this session
             with self.langfuse.start_as_current_span(
                 name="claude_code_session"
             ) as span:
+                # Enhanced session metadata
+                session_input = {
+                    "session_start": datetime.now().isoformat(),
+                    "user_id": self.user_id,
+                    "session_id": self.session_id,
+                    "session_type": "claude_code_session"
+                }
+
+                # Merge with provided metadata
+                full_metadata = {**(metadata or {})}
+                if "project_name" in full_metadata:
+                    session_input["project"] = full_metadata["project_name"]
+                if "project_path" in full_metadata:
+                    session_input["project_path"] = full_metadata["project_path"]
+
+                # Update span with session and user information
                 self.langfuse.update_current_span(
-                    input={
-                        "session_start": datetime.now().isoformat(),
-                        "user_id": self.user_id,
-                        "session_id": self.session_id
-                    },
-                    metadata=metadata or {}
+                    input=session_input,
+                    metadata=full_metadata
                 )
 
+                # Store trace ID for later use
                 self.current_trace_id = self.langfuse.get_current_trace_id()
+
+                # Create a score for session tracking
+                if self.current_trace_id:
+                    self.langfuse.create_score(
+                        name="session_active",
+                        trace_id=self.current_trace_id,
+                        value=1.0,
+                        comment=f"Active session: {self.session_id}"
+                    )
 
             print(f"✅ Session started: {self.session_id}")
             return self.session_id
