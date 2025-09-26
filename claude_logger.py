@@ -92,7 +92,7 @@ class ClaudeCodeLogger:
             Session ID
         """
         try:
-            # Start a span that will be associated with this session
+            # Start a span and update the trace with proper session and user associations
             with self.langfuse.start_as_current_span(
                 name="claude_code_session"
             ) as span:
@@ -111,7 +111,18 @@ class ClaudeCodeLogger:
                 if "project_path" in full_metadata:
                     session_input["project_path"] = full_metadata["project_path"]
 
-                # Update span with session and user information
+                # CRITICAL: Update the trace with session and user IDs at trace level
+                # This is what makes sessions appear in the LangFuse Sessions view
+                self.langfuse.update_current_trace(
+                    name="claude_code_session",
+                    user_id=self.user_id,
+                    session_id=self.session_id,
+                    input=session_input,
+                    metadata=full_metadata,
+                    tags=full_metadata.get("tags", ["claude-code", "auto-discovered"])
+                )
+
+                # Update span with session information
                 self.langfuse.update_current_span(
                     input=session_input,
                     metadata=full_metadata
