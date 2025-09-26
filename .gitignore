@@ -1,6 +1,7 @@
 # Environment variables
 .env
 .env.local
+# Keep .env.eval for reference
 
 # Python
 __pycache__/
